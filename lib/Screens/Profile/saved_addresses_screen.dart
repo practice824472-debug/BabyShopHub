@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../Controllers/auth_controller.dart';
+import '../../Models/address_model.dart';
 import '../../Utils/app_theme.dart';
+import '../../Utils/pakistan_cities.dart';
 
 class SavedAddressesScreen extends StatelessWidget {
   const SavedAddressesScreen({super.key});
@@ -42,80 +44,87 @@ class SavedAddressesScreen extends StatelessWidget {
 
   Future<void> _showAddDialog(BuildContext context) async {
     final streetCtrl = TextEditingController();
-    final cityCtrl = TextEditingController();
     final postalCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
+    // Use the same fixed city list as checkout, so a saved address's city
+    // always matches an item in the checkout city dropdown later.
+    String? selectedCity;
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add Address'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: streetCtrl,
-                autofocus: true,
-                textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  labelText: 'Street / Apartment',
-                  prefixIcon: Icon(Icons.home_outlined),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Add Address'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: streetCtrl,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Street / Apartment',
+                    prefixIcon: Icon(Icons.home_outlined),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: cityCtrl,
-                textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  labelText: 'City',
-                  prefixIcon: Icon(Icons.location_city_outlined),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: selectedCity,
+                  decoration: const InputDecoration(
+                    labelText: 'City',
+                    prefixIcon: Icon(Icons.location_city_outlined),
+                  ),
+                  items: pakistanCities
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
+                  onChanged: (v) => setDialogState(() => selectedCity = v),
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? 'Please select a city' : null,
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: postalCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Postal Code',
-                  prefixIcon: Icon(Icons.markunread_mailbox_outlined),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: postalCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Postal Code',
+                    prefixIcon: Icon(Icons.markunread_mailbox_outlined),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
-              ),
-            ],
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.pop(ctx, true);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.pop(ctx, true);
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
       ),
     );
 
     if (confirmed == true && context.mounted) {
-      // Store in the exact "Street, City, PostalCode" format that the checkout
-      // delivery screen parses, so saved addresses and delivery addresses stay
-      // consistent instead of conflicting.
-      final formatted =
-          '${streetCtrl.text.trim()}, ${cityCtrl.text.trim()}, ${postalCtrl.text.trim()}';
+      final address = AddressModel(
+        street: streetCtrl.text.trim(),
+        city: selectedCity ?? '',
+        postalCode: postalCtrl.text.trim(),
+      );
       final auth = context.read<AuthController>();
-      final success = await auth.addAddress(formatted);
+      final success = await auth.addAddress(address);
       if (!success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -169,7 +178,7 @@ class SavedAddressesScreen extends StatelessWidget {
 // ──────────────────────────────────────────────
 
 class _AddressTile extends StatelessWidget {
-  final String address;
+  final AddressModel address;
   final VoidCallback onDelete;
 
   const _AddressTile({required this.address, required this.onDelete});
@@ -180,7 +189,8 @@ class _AddressTile extends StatelessWidget {
       child: ListTile(
         leading: const Icon(Icons.location_on_outlined,
             color: AppTheme.primaryColor),
-        title: Text(address, maxLines: 3, overflow: TextOverflow.ellipsis),
+        title: Text(address.displayText,
+            maxLines: 3, overflow: TextOverflow.ellipsis),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
           onPressed: onDelete,

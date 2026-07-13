@@ -1,0 +1,65 @@
+Exception caught by gestures library ======================================================
+The following assertion was thrown while handling a pointer data packet:
+Assertion failed: file:///C:/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+!_debugDuringDeviceUpdate
+is not true
+
+When the exception was thrown, this was the stack: 
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 274:3       throw_
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 44:3        assertFailed
+package:flutter/src/rendering/mouse_tracker.dart 199:13                           [_deviceUpdatePhase]
+package:flutter/src/rendering/mouse_tracker.dart 319:7                            <fn>
+package:flutter/src/rendering/mouse_tracker.dart 187:5                            [_monitorMouseConnection]
+package:flutter/src/rendering/mouse_tracker.dart 318:5                            updateWithEvent
+package:flutter/src/rendering/binding.dart 466:5                                  dispatchEvent
+package:flutter/src/gestures/binding.dart 437:7                                   [_handlePointerEventImmediately]
+package:flutter/src/gestures/binding.dart 394:5                                   handlePointerEvent
+package:flutter/src/gestures/binding.dart 341:7                                   [_flushPointerEventQueue]
+package:flutter/src/gestures/binding.dart 308:9                                   [_handlePointerDataPacket]
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+lib/_engine/engine/platform_dispatcher.dart 1715:5                                invoke1
+lib/_engine/engine/platform_dispatcher.dart 295:5                                 invokeOnPointerDataPacket
+lib/_engine/engine/pointer_binding.dart 466:30                                    [_sendToFramework]
+lib/_engine/engine/pointer_binding.dart 248:7                                     onPointerData
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+lib/_engine/engine/pointer_binding.dart 1129:18                                   <fn>
+lib/_engine/engine/pointer_binding.dart 1027:7                                    <fn>
+lib/_engine/engine/pointer_binding.dart 600:9                                     loggedHandler
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/zone.dart 917:26                                               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/js_allow_interop_patch.dart 218:27    _callDartFunctionFast1
+dart-sdk/lib/_internal/js_dev_runtime/patch/js_allow_interop_patch.dart 78:15     ret
+====================================================================================================
+
+======== Exception caught by gestures library ======================================================
+The following assertion was thrown while handling a pointer data packet:
+Assertion failed: file:///C:/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+!_debugDuringDeviceUpdate
+is not true
+
+When the exception was thrown, this was the stack: 
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 274:3       throw_
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 44:3        assertFailed
+package:flutter/src/rendering/mouse_tracker.dart 199:13                           [_deviceUpdatePhase]
+package:flutter/src/rendering/mouse_tracker.dart 319:7                            <fn>
+package:flutter/src/rendering/mouse_tracker.dart 187:5                            [_monitorMouseConnection]
+package:flutter/src/rendering/mouse_tracker.dart 318:5                            updateWithEvent
+package:flutter/src/rendering/binding.dart 466:5                                  dispatchEvent
+package:flutter/src/gestures/binding.dart 437:7                                   [_handlePointerEventImmediately]
+package:flutter/src/gestures/binding.dart 394:5                                   handlePointerEvent
+package:flutter/src/gestures/binding.dart 341:7                                   [_flushPointerEventQueue]
+package:flutter/src/gestures/binding.dart 308:9                                   [_handlePointerDataPacket]
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+lib/_engine/engine/platform_dispatcher.dart 1715:5                                invoke1
+lib/_engine/engine/platform_dispatcher.dart 295:5                                 invokeOnPointerDataPacket
+lib/_engine/engine/pointer_binding.dart 466:30                                    [_sendToFramework]
+lib/_engine/engine/pointer_binding.dart 248:7                                     onPointerData
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+lib/_engine/engine/pointer_binding.dart 1117:16                                   <fn>
+lib/_engine/engine/pointer_binding.dart 1027:7                                    <fn>
+lib/_engine/engine/pointer_binding.dart 600:9                                     loggedHandler
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/zone.dart 917:26                                               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/js_allow_interop_patch.dart 218:27    _callDartFunctionFast1
+dart-sdk/lib/_internal/js_dev_runtime/patch/js_allow_interop_patch.dart 78:15     ret
+====================================================================================================

@@ -68,6 +68,10 @@ lib/
 - Google Sign-In only works out of the box on Android/iOS. Running on Flutter Web (e.g. `flutter run -d chrome`) will throw `ClientID not set` when Google Sign-In is used, because it needs its own OAuth Web client ID — see the comment in `web/index.html` for how to add it.
 - `flutter analyze` is clean of warnings/errors; the remaining ~80 issues are all `info`-level style suggestions (deprecated `withOpacity`/`value` usages, `prefer_const_constructors`, `use_build_context_synchronously`) — safe to leave, tackle incrementally if desired.
 
+## Saved Addresses
+
+Saved delivery addresses are stored as structured data (`lib/Models/address_model.dart`: `street`/`city`/`postalCode`), not a single joined string. The previous "Street, City, PostalCode" string format broke whenever a street address itself contained a comma, and silently dropped city/postal code when the format didn't line up — re-parsing a flattened string on every read was inherently fragile. `AuthController.addresses` is `List<AddressModel>`; `AddressModel.fromDynamic` still reads old string-formatted entries already in Firestore so existing saved addresses keep working. The "Add Address" dialog (`saved_addresses_screen.dart`) now picks the city from the same `pakistanCities` list the checkout screen uses, so a saved address's city always matches an entry in the checkout city dropdown.
+
 ## Image Uploads (Cloudinary)
 
 Admin product images are uploaded directly to Cloudinary from the app (unsigned upload, no API secret bundled client-side):

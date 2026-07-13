@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../Controllers/auth_controller.dart';
+import '../../Models/address_model.dart';
 import '../../Models/order_model.dart';
 import '../../Utils/app_theme.dart';
 import '../../Utils/pakistan_cities.dart';
@@ -52,31 +53,19 @@ class _AddressScreenState extends State<AddressScreen> {
     super.dispose();
   }
 
-  void _applySavedAddress(String raw, int index) {
-    final parts = raw.split(',').map((s) => s.trim()).toList();
+  void _applySavedAddress(AddressModel address, int index) {
     setState(() {
       _selectedSavedIndex = index;
       _showNewAddressForm = false;
+      _addressCtrl.text = address.street;
+      // Only preselect the city in the dropdown if it's one of the fixed
+      // options it offers — otherwise DropdownButtonFormField would be
+      // asked to show a value that isn't in its `items`, and silently
+      // renders as unselected.
+      _selectedCity =
+          pakistanCities.contains(address.city) ? address.city : null;
+      _postalCtrl.text = address.postalCode;
     });
-    _addressCtrl.text = parts.isNotEmpty ? parts[0] : raw;
-    if (parts.length == 3) {
-      _selectedCity = parts[1];
-      _postalCtrl.text = parts[2];
-    } else if (parts.length == 2) {
-      final lastParts =
-      parts[1].split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
-      if (lastParts.length > 1 &&
-          RegExp(r'^\d').hasMatch(lastParts.last)) {
-        _postalCtrl.text = lastParts.last;
-        _selectedCity = lastParts.sublist(0, lastParts.length - 1).join(' ');
-      } else {
-        _selectedCity = parts[1];
-        _postalCtrl.text = '';
-      }
-    } else {
-      _selectedCity = null;
-      _postalCtrl.text = '';
-    }
   }
 
   void _selectNewAddress() {
@@ -179,7 +168,7 @@ class _AddressScreenState extends State<AddressScreen> {
                             final addr = entry.value;
                             final selected = _selectedSavedIndex == idx;
                             return _SavedAddressTile(
-                              address: addr,
+                              address: addr.displayText,
                               selected: selected,
                               onTap: () => _applySavedAddress(addr, idx),
                             );

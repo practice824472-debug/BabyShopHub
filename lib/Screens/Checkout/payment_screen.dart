@@ -216,7 +216,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                       ),
                                     ),
                                     Text(
-                                      '\${item.subtotal.toStringAsFixed(2)}',
+                                      '\$${item.subtotal.toStringAsFixed(2)}',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600),
                                     ),
@@ -290,7 +290,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  Text('-\${discount.toStringAsFixed(2)}',
+                                  Text('-\$${discount.toStringAsFixed(2)}',
                                       style: const TextStyle(
                                           color: AppTheme.successColor,
                                           fontWeight: FontWeight.w600)),
@@ -304,7 +304,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     style: TextStyle(fontWeight: FontWeight.bold)),
                                 const Spacer(),
                                 Text(
-                                  '\${total.toStringAsFixed(2)}',
+                                  '\$${total.toStringAsFixed(2)}',
                                   style: const TextStyle(
                                     color: AppTheme.successColor,
                                     fontSize: 20,

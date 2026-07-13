@@ -6,6 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../Models/address_model.dart';
+
 class AuthController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -29,7 +31,7 @@ class AuthController with ChangeNotifier {
   String _userName = '';
   String _userPhone = '';
   String _photoUrl = '';
-  List<String> _addresses = [];
+  List<AddressModel> _addresses = [];
 
   User? get user => _user;
   String? get userRole => _userRole;
@@ -40,7 +42,7 @@ class AuthController with ChangeNotifier {
   String get userName => _userName;
   String get userPhone => _userPhone;
   String get photoUrl => _photoUrl;
-  List<String> get addresses => List.unmodifiable(_addresses);
+  List<AddressModel> get addresses => List.unmodifiable(_addresses);
 
   // Check if user is already logged in
   void checkAuthStatus() {
@@ -62,7 +64,9 @@ class AuthController with ChangeNotifier {
       _userName = data['name'] ?? '';
       _userPhone = data['phone'] ?? '';
       _photoUrl = data['photoUrl'] ?? '';
-      _addresses = List<String>.from(data['addresses'] ?? []);
+      _addresses = List<dynamic>.from(data['addresses'] ?? [])
+          .map(AddressModel.fromDynamic)
+          .toList();
       notifyListeners();
     } catch (e) {
       _userRole = 'user';
@@ -91,7 +95,9 @@ class AuthController with ChangeNotifier {
       _userName = data['name'] ?? '';
       _userPhone = data['phone'] ?? '';
       _photoUrl = data['photoUrl'] ?? '';
-      _addresses = List<String>.from(data['addresses'] ?? []);
+      _addresses = List<dynamic>.from(data['addresses'] ?? [])
+          .map(AddressModel.fromDynamic)
+          .toList();
       notifyListeners();
     } catch (_) {}
   }
@@ -177,15 +183,14 @@ class AuthController with ChangeNotifier {
   // ── Addresses ────────────────────────────
 
   /// Adds a new address and persists to Firestore.
-  Future<bool> addAddress(String address) async {
+  Future<bool> addAddress(AddressModel address) async {
     if (_user == null) return false;
-    final trimmed = address.trim();
-    if (trimmed.isEmpty) return false;
+    if (address.street.trim().isEmpty) return false;
 
     try {
-      final updated = [..._addresses, trimmed];
+      final updated = [..._addresses, address];
       await _firestore.collection('users').doc(_user!.uid).update({
-        'addresses': updated,
+        'addresses': updated.map((a) => a.toMap()).toList(),
       });
       _addresses = updated;
       notifyListeners();
@@ -204,7 +209,7 @@ class AuthController with ChangeNotifier {
     try {
       final updated = [..._addresses]..removeAt(index);
       await _firestore.collection('users').doc(_user!.uid).update({
-        'addresses': updated,
+        'addresses': updated.map((a) => a.toMap()).toList(),
       });
       _addresses = updated;
       notifyListeners();

@@ -331,7 +331,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _chartCard({required String title, required Widget child}) {
+  Widget _chartCard({required String title, required Widget child, double height = 180}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -345,7 +345,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         children: [
           Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
           const SizedBox(height: 12),
-          SizedBox(height: 180, child: child),
+          SizedBox(height: height, child: child),
         ],
       ),
     );
@@ -438,6 +438,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
     return _chartCard(
       title: 'Products by Category',
+      // Taller than the default 180: with up to 8 categories the legend
+      // list needs more room than the bar/line charts on this dashboard,
+      // otherwise its last rows get clipped against the card's bottom edge.
+      height: 220,
       child: Row(
         children: [
           Expanded(
