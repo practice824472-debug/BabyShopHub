@@ -66,7 +66,21 @@ lib/
 - Orders and Profile tabs in bottom nav are still placeholder screens
 - Search is client-side only (no Firestore query)
 - Google Sign-In only works out of the box on Android/iOS. Running on Flutter Web (e.g. `flutter run -d chrome`) will throw `ClientID not set` when Google Sign-In is used, because it needs its own OAuth Web client ID — see the comment in `web/index.html` for how to add it.
+- Google Sign-In on **Android** currently fails with `PlatformException(sign_in_failed, com.google.android.gms.common.api.b: 10, null, null)` (ApiException code 10 = DEVELOPER_ERROR). Root cause: `android/app/google-services.json`'s `oauth_client` array is empty — no SHA-1/SHA-256 certificate fingerprint has been registered for this Android app in Firebase Console, so Firebase never generated an OAuth client for it. This can't be fixed by editing app code; it needs the app's signing certificate fingerprint added in Firebase Console (Project Settings → your Android app → Add fingerprint), then a fresh `google-services.json` downloaded and dropped into `android/app/`. See the "Google Sign-In on Android" section below for the exact steps.
 - `flutter analyze` is clean of warnings/errors; the remaining ~80 issues are all `info`-level style suggestions (deprecated `withOpacity`/`value` usages, `prefer_const_constructors`, `use_build_context_synchronously`) — safe to leave, tackle incrementally if desired.
+
+## Google Sign-In on Android
+
+If Google Sign-In on a real/emulated Android device fails with `PlatformException(sign_in_failed, com.google.android.gms.common.api.b: 10, ...)`, that's ApiException code 10 (DEVELOPER_ERROR) — Firebase doesn't recognize the app's signing certificate. Fix:
+
+1. Get the SHA-1 (and ideally SHA-256) fingerprint of the keystore used to build/run the app:
+   - Debug builds (default `flutter run`): `keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore -storepass android -keypass android`
+   - Release builds: use your release keystore's alias/path instead.
+2. In [Firebase Console](https://console.firebase.google.com) → Project Settings → your Android app (`com.example.flutter_eproject`) → "Add fingerprint" → paste the SHA-1 (and SHA-256).
+3. Download the regenerated `google-services.json` from that same page and replace `android/app/google-services.json` in this project.
+4. Rebuild the app (`flutter clean` then rebuild) — Google Sign-In should then succeed on Android.
+
+Every machine/keystore that runs the app (each teammate's debug keystore, CI, the Play Store release keystore) needs its own fingerprint added, or that machine's build will hit the same error.
 
 ## Saved Addresses
 
