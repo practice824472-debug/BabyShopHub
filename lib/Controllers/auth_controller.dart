@@ -10,7 +10,15 @@ class AuthController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  // Lazily created: constructing GoogleSignIn() eagerly on Flutter Web
+  // triggers plugin initialization immediately, which throws an assertion
+  // error if no Google Sign-In web client ID is configured (see
+  // web/index.html). Deferring construction until Google sign-in is
+  // actually used avoids that crash on app startup for users who never
+  // tap "Sign in with Google" (e.g. on Android/iOS, which read their
+  // config from google-services.json / GoogleService-Info.plist instead).
+  GoogleSignIn? _googleSignInInstance;
+  GoogleSignIn get _googleSignIn => _googleSignInInstance ??= GoogleSignIn();
 
   User? _user;
   String? _userRole; // 'user' or 'admin'
@@ -404,7 +412,15 @@ class AuthController with ChangeNotifier {
   Future<void> logout() async {
     try {
       await _auth.signOut();
-      await _googleSignIn.signOut();
+      // Best-effort: Google sign-out is only relevant if the user actually
+      // signed in with Google, and on an unconfigured web build it can
+      // throw before it even reaches the network call. Never let that
+      // block the real (Firebase) logout that already succeeded above.
+      try {
+        await _googleSignIn.signOut();
+      } catch (_) {
+        // Ignore — Firebase sign-out above is what actually matters.
+      }
       _user = null;
       _userRole = null;
       _error = null;

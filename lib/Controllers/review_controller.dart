@@ -87,7 +87,6 @@ class ReviewController with ChangeNotifier {
         helpful: 0,
       );
 
-      final docRef =
       await _firestore.collection('reviews').add(review.toJson());
 
       // Update product's average rating

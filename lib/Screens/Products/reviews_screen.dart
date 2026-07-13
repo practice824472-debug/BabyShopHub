@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../Controllers/review_controller.dart';
 import '../../Models/product_model.dart';
 import '../../Models/review_model.dart';
-import '../../Utils/app_theme.dart';
 
 class ReviewsScreen extends StatefulWidget {
   final ProductModel product;

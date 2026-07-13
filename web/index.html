@@ -26,6 +26,18 @@
   <meta name="apple-mobile-web-app-title" content="flutter_eproject">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
+  <!--
+    Google Sign-In on Flutter Web requires its own OAuth "Web client ID"
+    (different from the Firebase apiKey/appId already in firebase_options.dart).
+    Get it from Firebase Console → Authentication → Sign-in method → Google →
+    Web SDK configuration, then uncomment and fill in the line below.
+    Without it, "Sign in with Google" only works on Android/iOS (which read
+    their config from google-services.json / GoogleService-Info.plist), and
+    a Chrome/web run will fail with "ClientID not set" the moment
+    Google Sign-In is used.
+  -->
+  <!-- <meta name="google-signin-client_id" content="YOUR_WEB_CLIENT_ID.apps.googleusercontent.com" /> -->
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 

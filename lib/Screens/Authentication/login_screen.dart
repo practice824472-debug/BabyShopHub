@@ -24,8 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Provider.of<AuthController>(context, listen: false);
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(

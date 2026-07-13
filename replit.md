@@ -65,6 +65,8 @@ lib/
 - SignupScreen instantiates a local `AuthController` instead of reading from Provider
 - Orders and Profile tabs in bottom nav are still placeholder screens
 - Search is client-side only (no Firestore query)
+- Google Sign-In only works out of the box on Android/iOS. Running on Flutter Web (e.g. `flutter run -d chrome`) will throw `ClientID not set` when Google Sign-In is used, because it needs its own OAuth Web client ID — see the comment in `web/index.html` for how to add it.
+- `flutter analyze` is clean of warnings/errors; the remaining ~80 issues are all `info`-level style suggestions (deprecated `withOpacity`/`value` usages, `prefer_const_constructors`, `use_build_context_synchronously`) — safe to leave, tackle incrementally if desired.
 
 ## Image Uploads (Cloudinary)
 

@@ -9,7 +9,6 @@ class SupportScreen extends StatefulWidget {
 }
 
 class _SupportScreenState extends State<SupportScreen> {
-  int _selectedTabIndex = 0;
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _subjectController = TextEditingController();
@@ -130,6 +129,8 @@ class _FAQTabState extends State<_FAQTab> {
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 6),
           child: ExpansionTile(
+            key: ValueKey(index),
+            initiallyExpanded: isExpanded,
             title: Text(
               faq['question']!,
               style: const TextStyle(fontWeight: FontWeight.bold),
