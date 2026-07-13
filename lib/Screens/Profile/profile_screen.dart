@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../Controllers/payment_controller.dart';
 import '../../Controllers/auth_controller.dart';
 import '../../Controllers/notification_controller.dart';
-import '../../Controllers/theme_controller.dart';
 import '../../Controllers/wishlist_controller.dart';
 import '../../Utils/app_theme.dart';
 import '../Authentication/Views/splash_screen.dart';
@@ -217,27 +216,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => const NotificationsScreen()),
                 ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // ── Preferences section ──
-              _SectionLabel('Preferences'),
-              Consumer<ThemeController>(
-                builder: (context, themeCtrl, _) {
-                  return SwitchListTile(
-                    secondary: Icon(
-                      themeCtrl.isDarkMode
-                          ? Icons.dark_mode_outlined
-                          : Icons.light_mode_outlined,
-                      color: AppTheme.textPrimaryColor,
-                    ),
-                    title: const Text('Dark Mode'),
-                    subtitle: Text(themeCtrl.isDarkMode ? 'On' : 'Off'),
-                    value: themeCtrl.isDarkMode,
-                    onChanged: (_) => themeCtrl.toggleTheme(),
-                  );
-                },
               ),
 
               const SizedBox(height: 8),

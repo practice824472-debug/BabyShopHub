@@ -11,7 +11,6 @@ import 'Controllers/order_controller.dart';
 import 'Controllers/password_controller.dart';
 import 'Controllers/product_controller.dart';
 import 'Controllers/review_controller.dart';
-import 'Controllers/theme_controller.dart';
 import 'Controllers/wishlist_controller.dart';
 import 'Screens/Admin/admin_coupons_screen.dart';
 import 'Screens/Admin/admin_dashboard_screen.dart';
@@ -61,38 +60,30 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WishlistController()),
         ChangeNotifierProvider(create: (_) => CouponController()),
         ChangeNotifierProvider(create: (_) => NotificationController()),
-        ChangeNotifierProvider(
-          create: (_) => ThemeController()..loadThemePreference(),
-        ),
       ],
-      child: Consumer<ThemeController>(
-        builder: (context, themeCtrl, _) {
-          return MaterialApp(
-            title: 'BabyShopHub',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeCtrl.themeMode,
-            home: const SplashScreen(),
-            debugShowCheckedModeBanner: false,
-            routes: {
-              '/login': (_) => const LoginScreen(),
-              '/signup': (_) => SignupScreen(),
-              '/user-home': (_) => const MainNavigationScreen(),
-              '/admin-dashboard': (_) => const AdminDashboardScreen(),
-              '/admin-products': (_) => const AdminProductsScreen(),
-              '/admin-orders': (_) => const AdminOrdersScreen(),
-              '/admin-users': (_) => const AdminUsersScreen(),
-              '/admin-coupons': (_) => const AdminCouponsScreen(),
-              '/checkout': (_) => const AddressScreen(),
-              '/orders': (_) => const OrdersScreen(),
-              '/profile': (_) => const ProfileScreen(),
-              '/support': (_) => const SupportScreen(),
-              '/cart': (_) => const MainNavigationScreen(),
-              '/forgot-password': (_) => const ForgotPasswordScreen(),
-              '/wishlist': (_) => const WishlistScreen(),
-              '/notifications': (_) => const NotificationsScreen(),
-            },
-          );
+      child: MaterialApp(
+        title: 'BabyShopHub',
+        theme: AppTheme.lightTheme,
+        themeMode: ThemeMode.light,
+        home: const SplashScreen(),
+        debugShowCheckedModeBanner: false,
+        routes: {
+          '/login': (_) => const LoginScreen(),
+          '/signup': (_) => SignupScreen(),
+          '/user-home': (_) => const MainNavigationScreen(),
+          '/admin-dashboard': (_) => const AdminDashboardScreen(),
+          '/admin-products': (_) => const AdminProductsScreen(),
+          '/admin-orders': (_) => const AdminOrdersScreen(),
+          '/admin-users': (_) => const AdminUsersScreen(),
+          '/admin-coupons': (_) => const AdminCouponsScreen(),
+          '/checkout': (_) => const AddressScreen(),
+          '/orders': (_) => const OrdersScreen(),
+          '/profile': (_) => const ProfileScreen(),
+          '/support': (_) => const SupportScreen(),
+          '/cart': (_) => const MainNavigationScreen(),
+          '/forgot-password': (_) => const ForgotPasswordScreen(),
+          '/wishlist': (_) => const WishlistScreen(),
+          '/notifications': (_) => const NotificationsScreen(),
         },
       ),
     );
