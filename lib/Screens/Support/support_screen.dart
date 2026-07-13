@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../Controllers/auth_controller.dart';
+import '../../Controllers/support_controller.dart';
 import '../../Utils/app_theme.dart';
 
 class SupportScreen extends StatefulWidget {
@@ -13,6 +16,15 @@ class _SupportScreenState extends State<SupportScreen> {
   final _emailController = TextEditingController();
   final _subjectController = TextEditingController();
   final _messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill from the signed-in user's profile, if available.
+    final auth = context.read<AuthController>();
+    _nameController.text = auth.userName;
+    _emailController.text = auth.user?.email ?? '';
+  }
 
   @override
   void dispose() {
@@ -183,33 +195,37 @@ class _ContactUsTabState extends State<_ContactUsTab> {
 
     setState(() => _isSubmitting = true);
 
-    try {
-      // Simulate sending contact form
-      await Future.delayed(const Duration(seconds: 2));
+    final auth = context.read<AuthController>();
+    final supportCtrl = context.read<SupportController>();
+    final success = await supportCtrl.submitMessage(
+      userId: auth.user?.uid,
+      name: widget.nameController.text.trim(),
+      email: widget.emailController.text.trim(),
+      subject: widget.subjectController.text.trim(),
+      message: widget.messageController.text.trim(),
+    );
 
-      if (!mounted) return;
+    if (!mounted) return;
 
+    if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Thank you! We\'ll get back to you soon.'),
           duration: Duration(seconds: 3),
         ),
       );
-
-      // Clear form
-      widget.nameController.clear();
-      widget.emailController.clear();
       widget.subjectController.clear();
       widget.messageController.clear();
-    } catch (e) {
-      if (!mounted) return;
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to send message. Please try again.')),
+        SnackBar(
+          content: Text(supportCtrl.error ?? 'Failed to send message. Please try again.'),
+        ),
       );
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+    }
+
+    if (mounted) {
+      setState(() => _isSubmitting = false);
     }
   }
 

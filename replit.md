@@ -54,10 +54,10 @@ lib/
 | 3 | Cart | ✅ Done |
 | 3 | Checkout (Address → Payment → Confirmation) | ✅ Done |
 | 4 | Orders screen, Order tracking | ✅ Done |
-| 4 | Reviews & Ratings | 🔜 Next |
+| 4 | Reviews & Ratings | ✅ Done |
 | 5 | Admin Panel | ✅ Done |
 | — | Profile screen (edit, password, addresses, logout) | ✅ Done |
-| — | Support / FAQ | 🔜 Next |
+| — | Support / FAQ | ✅ Done |
 
 ## Known Issues / TODOs
 
@@ -68,6 +68,12 @@ lib/
 - Google Sign-In only works out of the box on Android/iOS. Running on Flutter Web (e.g. `flutter run -d chrome`) will throw `ClientID not set` when Google Sign-In is used, because it needs its own OAuth Web client ID — see the comment in `web/index.html` for how to add it.
 - Google Sign-In on **Android** currently fails with `PlatformException(sign_in_failed, com.google.android.gms.common.api.b: 10, null, null)` (ApiException code 10 = DEVELOPER_ERROR). Root cause: `android/app/google-services.json`'s `oauth_client` array is empty — no SHA-1/SHA-256 certificate fingerprint has been registered for this Android app in Firebase Console, so Firebase never generated an OAuth client for it. This can't be fixed by editing app code; it needs the app's signing certificate fingerprint added in Firebase Console (Project Settings → your Android app → Add fingerprint), then a fresh `google-services.json` downloaded and dropped into `android/app/`. See the "Google Sign-In on Android" section below for the exact steps.
 - `flutter analyze` is clean of warnings/errors; the remaining ~80 issues are all `info`-level style suggestions (deprecated `withOpacity`/`value` usages, `prefer_const_constructors`, `use_build_context_synchronously`) — safe to leave, tackle incrementally if desired.
+
+## Feedback & Support
+
+The Support screen's "Contact Us" tab now actually persists submissions to a `contact_messages` Firestore collection (previously it just showed a fake "sent" toast with nowhere for the message to go). Admins review and resolve them from **Admin Dashboard → User Messages** (`admin_messages_screen.dart` / `SupportController`). This project's Firestore security rules aren't checked into this repo (they're configured directly in Firebase Console) — if writes to `contact_messages` are rejected with a permissions error, add a rule for that collection alongside whatever pattern is already used for `reviews`/`notifications`.
+
+"Seller Ratings" from the original requirements doc doesn't apply here — BabyShopHub is a single-vendor store (one admin-managed catalog), not a multi-seller marketplace, so there's no separate seller entity to rate. Product reviews/ratings cover the equivalent feedback loop.
 
 ## Google Sign-In on Android
 

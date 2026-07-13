@@ -173,6 +173,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         onTap: () =>
                             Navigator.pushNamed(context, '/admin-coupons'),
                       ),
+                      _buildManagementTile(
+                        context,
+                        title: 'User Messages',
+                        subtitle: 'Review and respond to contact inquiries',
+                        icon: Icons.mark_email_unread_outlined,
+                        color: const Color(0xFFEF4444),
+                        onTap: () =>
+                            Navigator.pushNamed(context, '/admin-messages'),
+                      ),
                     ],
                   ),
                 ),

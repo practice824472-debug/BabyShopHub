@@ -11,9 +11,11 @@ import 'Controllers/order_controller.dart';
 import 'Controllers/password_controller.dart';
 import 'Controllers/product_controller.dart';
 import 'Controllers/review_controller.dart';
+import 'Controllers/support_controller.dart';
 import 'Controllers/wishlist_controller.dart';
 import 'Screens/Admin/admin_coupons_screen.dart';
 import 'Screens/Admin/admin_dashboard_screen.dart';
+import 'Screens/Admin/admin_messages_screen.dart';
 import 'Screens/Admin/admin_orders_screen.dart';
 import 'Screens/Admin/admin_products_screen.dart';
 import 'Screens/Admin/admin_users_screen.dart';
@@ -60,6 +62,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WishlistController()),
         ChangeNotifierProvider(create: (_) => CouponController()),
         ChangeNotifierProvider(create: (_) => NotificationController()),
+        ChangeNotifierProvider(create: (_) => SupportController()),
       ],
       child: MaterialApp(
         title: 'BabyShopHub',
@@ -76,6 +79,7 @@ class MyApp extends StatelessWidget {
           '/admin-orders': (_) => const AdminOrdersScreen(),
           '/admin-users': (_) => const AdminUsersScreen(),
           '/admin-coupons': (_) => const AdminCouponsScreen(),
+          '/admin-messages': (_) => const AdminMessagesScreen(),
           '/checkout': (_) => const AddressScreen(),
           '/orders': (_) => const OrdersScreen(),
           '/profile': (_) => const ProfileScreen(),
