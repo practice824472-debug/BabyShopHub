@@ -26,6 +26,23 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     });
   }
 
+  /// Defers opening a dialog to the next frame instead of doing it inline
+  /// inside the button's onPressed/onTap handler.
+  ///
+  /// On Flutter Web, opening a showDialog() synchronously from a hover-
+  /// tracked Material button (FloatingActionButton, InkWell, etc.) can hit
+  /// a Flutter engine re-entrancy bug in mouse_tracker.dart
+  /// ("!_debugDuringDeviceUpdate is not true") because the dialog swaps out
+  /// the widget the mouse is hovering over while the mouse tracker is mid
+  /// update. Once that assertion fires it can leave pointer/hover event
+  /// dispatch stuck, making the app look frozen until it's restarted. Firing
+  /// after the current frame avoids the conflict.
+  void _openDialogNextFrame(VoidCallback openDialog) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) openDialog();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,9 +102,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue.shade700,
         child: const Icon(Icons.add),
-        onPressed: () {
-          _showAddProductDialog(context);
-        },
+        onPressed: () => _openDialogNextFrame(() => _showAddProductDialog(context)),
       ),
     );
   }
@@ -256,26 +271,22 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                   icon: Icons.edit,
                   label: 'Edit',
                   color: Colors.blue,
-                  onTap: () {
-                    _showEditProductDialog(context, product, adminController);
-                  },
+                  onTap: () => _openDialogNextFrame(
+                      () => _showEditProductDialog(context, product, adminController)),
                 ),
                 _buildActionButton(
                   icon: Icons.inventory,
                   label: 'Stock',
                   color: Colors.orange,
-                  onTap: () {
-                    _showUpdateStockDialog(
-                        context, product, adminController);
-                  },
+                  onTap: () => _openDialogNextFrame(
+                      () => _showUpdateStockDialog(context, product, adminController)),
                 ),
                 _buildActionButton(
                   icon: Icons.delete,
                   label: 'Delete',
                   color: Colors.red,
-                  onTap: () {
-                    _showDeleteConfirmation(context, product, adminController);
-                  },
+                  onTap: () => _openDialogNextFrame(
+                      () => _showDeleteConfirmation(context, product, adminController)),
                 ),
               ],
             ),
