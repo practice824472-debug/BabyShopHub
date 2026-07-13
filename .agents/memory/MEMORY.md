@@ -1,0 +1,1 @@
+- [Private widgets pattern](private-widgets.md) — Dart private classes (_Foo) cannot be imported across files; always extract shared widgets into a public file when used by multiple screens.
