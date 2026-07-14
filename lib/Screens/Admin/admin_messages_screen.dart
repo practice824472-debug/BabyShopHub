@@ -76,7 +76,8 @@ class _AdminMessagesScreenState extends State<AdminMessagesScreen> {
                     FilterChip(
                       label: const Text('Unresolved only'),
                       selected: _showUnresolvedOnly,
-                      onSelected: (v) => setState(() => _showUnresolvedOnly = v),
+                      onSelected: (v) =>
+                          setState(() => _showUnresolvedOnly = v),
                     ),
                   ],
                 ),
@@ -146,7 +147,8 @@ class _MessageCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(message.message, style: TextStyle(color: Colors.grey.shade800)),
+                Text(message.message,
+                    style: TextStyle(color: Colors.grey.shade800)),
                 const SizedBox(height: 12),
                 Text(
                   _formatDate(message.createdAt),

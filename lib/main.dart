@@ -10,6 +10,7 @@ import 'Controllers/notification_controller.dart';
 import 'Controllers/order_controller.dart';
 import 'Controllers/password_controller.dart';
 import 'Controllers/product_controller.dart';
+import 'Controllers/chat_controller.dart';
 import 'Controllers/review_controller.dart';
 import 'Controllers/support_controller.dart';
 import 'Controllers/wishlist_controller.dart';
@@ -32,7 +33,6 @@ import 'Screens/Support/support_screen.dart';
 import 'Screens/Wishlist/wishlist_screen.dart';
 import 'Utils/app_theme.dart';
 import 'firebase_options.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +63,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CouponController()),
         ChangeNotifierProvider(create: (_) => NotificationController()),
         ChangeNotifierProvider(create: (_) => SupportController()),
+        ChangeNotifierProvider(create: (_) => ChatController()),
       ],
       child: MaterialApp(
         title: 'BabyShopHub',

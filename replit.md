@@ -71,7 +71,11 @@ lib/
 
 ## Feedback & Support
 
-The Support screen's "Contact Us" tab now actually persists submissions to a `contact_messages` Firestore collection (previously it just showed a fake "sent" toast with nowhere for the message to go). Admins review and resolve them from **Admin Dashboard → User Messages** (`admin_messages_screen.dart` / `SupportController`). This project's Firestore security rules aren't checked into this repo (they're configured directly in Firebase Console) — if writes to `contact_messages` are rejected with a permissions error, add a rule for that collection alongside whatever pattern is already used for `reviews`/`notifications`.
+The Support screen's "Contact Us" tab now actually persists submissions to a `contact_messages` Firestore collection (previously it just showed a fake "sent" toast with nowhere for the message to go). Admins review and resolve them from **Admin Dashboard → Support Center → Contact Messages** (`admin_messages_screen.dart` / `SupportController`). This project's Firestore security rules aren't checked into this repo (they're configured directly in Firebase Console) — if writes to `contact_messages` are rejected with a permissions error, add a rule for that collection alongside whatever pattern is already used for `reviews`/`notifications`.
+
+### Live Chat
+
+Alongside the static Contact Us form, Support screen's "Chat" tab (and Admin Dashboard → Support Center → "Live Chat" tab) give users and the admin a real-time back-and-forth conversation. Data model: `chat_threads/{userId}` (one thread doc per user, doc id = uid) holding `userName`/`userEmail`/`lastMessage`/`lastMessageAt`/`lastSenderRole`/`unreadForAdmin`/`unreadForUser`, with a `messages` subcollection (`senderId`/`senderRole`/`text`/`createdAt`) underneath. `ChatController` (`lib/Controllers/chat_controller.dart`) drives both sides; `lib/Widgets/chat_view.dart` is the shared bubble-list + input UI reused by the user's chat tab and `admin_chat_thread_screen.dart`. Same Firestore-rules caveat as `contact_messages` applies to `chat_threads`.
 
 "Seller Ratings" from the original requirements doc doesn't apply here — BabyShopHub is a single-vendor store (one admin-managed catalog), not a multi-seller marketplace, so there's no separate seller entity to rate. Product reviews/ratings cover the equivalent feedback loop.
 
@@ -102,7 +106,15 @@ Admin product images are uploaded directly to Cloudinary from the app (unsigned 
 
 ## Product Categories
 
-`lib/Utils/product_categories.dart` is the single source of truth for category names (`Diapers`, `Baby Food`, `Toys`, `Clothes`, `Baby Care`, `Feeding`, `Bath`, `Accessories`). Both the admin add/edit product dropdown and the customer-facing category filter (`ProductController.categories`) read from this list, so a product's category can no longer be mistyped or drift out of sync between admin entry and customer filtering.
+`lib/Utils/product_categories.dart` is the single source of truth for category names (`Diapers`, `Baby Food`, `Toys`, `Clothes`, `Baby Care`, `Feeding`, `Bath`, `Accessories`). Both the admin add/edit product dropdown and the customer-facing category filter (`ProductController.categories`) read from this list, so a product's category can no longer be mistyped or drift out of sync between admin entry and customer filtering. **Admin Products screen** also has a category filter chip row (`admin_products_screen.dart`) built off the same list, so admins can narrow the product list by category.
+
+## Home Promo Carousel
+
+`lib/Widgets/promo_carousel.dart` renders an auto-scrolling (`carousel_slider`, already a dependency) banner row above the home screen's search field. Banners are drawn in-app (gradient + icon + text) rather than loaded from Firebase Storage, since the project has no promotional image assets — swap in `Image.network` there once real campaign artwork exists.
+
+## Admin Dashboard "Products by Category" Chart
+
+This chart (`admin_dashboard_screen.dart`, `_buildCategoryBreakdownChart`) always computed real counts from `AdminController.products` grouped by category — it was never mocked data. The confusing "every category shows the same count/%" look came from two things that are now fixed: (1) only 6 colors existed for up to 8 categories, so colors wrapped around and two unrelated categories rendered identically; the palette now has 10 distinct colors. (2) entries were in arbitrary map order instead of sorted, making a genuinely even product spread look even more suspicious; entries are now sorted by count descending.
 
 ## Branded Transitions
 

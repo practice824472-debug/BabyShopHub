@@ -3,11 +3,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../../Controllers/auth_controller.dart';
+import '../../Controllers/chat_controller.dart';
 import '../../Controllers/notification_controller.dart';
 import '../../Controllers/product_controller.dart';
 import '../../Controllers/wishlist_controller.dart';
 import '../../Utils/app_theme.dart';
 import '../../Widgets/product_card.dart';
+import '../../Widgets/promo_carousel.dart';
 import '../../Widgets/shimmer_widgets.dart';
 import '../Notifications/notifications_screen.dart';
 
@@ -93,6 +95,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               if (!context.mounted) return;
               context.read<WishlistController>().reset();
               context.read<NotificationController>().reset();
+              context.read<ChatController>().reset();
               Navigator.pushReplacementNamed(context, '/login');
             },
             icon: const Icon(Icons.logout),
@@ -112,6 +115,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildHeroCard(context),
+                        const SizedBox(height: 16),
+                        const PromoCarousel(),
                         const SizedBox(height: 16),
                         _buildSearchField(productController),
                         const SizedBox(height: 16),

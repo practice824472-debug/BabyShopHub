@@ -70,11 +70,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             crossAxisSpacing: 14,
                             childAspectRatio: isWide ? 1.45 : 1.12,
                             children: [
-                              _buildStatCard('Users', '${stats?.totalUsers ?? 0}',
-                                  Icons.people_alt, const Color(0xFF3B6FF6)),
-                              _buildStatCard('Orders', '${stats?.totalOrders ?? 0}',
-                                  Icons.receipt_long, const Color(0xFF11A36A)),
-                              _buildStatCard('Products',
+                              _buildStatCard(
+                                  'Users',
+                                  '${stats?.totalUsers ?? 0}',
+                                  Icons.people_alt,
+                                  const Color(0xFF3B6FF6)),
+                              _buildStatCard(
+                                  'Orders',
+                                  '${stats?.totalOrders ?? 0}',
+                                  Icons.receipt_long,
+                                  const Color(0xFF11A36A)),
+                              _buildStatCard(
+                                  'Products',
                                   '${stats?.totalProducts ?? 0}',
                                   Icons.inventory_2,
                                   const Color(0xFFF59E0B)),
@@ -162,7 +169,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         subtitle: 'Review customers and account access',
                         icon: Icons.admin_panel_settings_outlined,
                         color: const Color(0xFFF59E0B),
-                        onTap: () => Navigator.pushNamed(context, '/admin-users'),
+                        onTap: () =>
+                            Navigator.pushNamed(context, '/admin-users'),
                       ),
                       _buildManagementTile(
                         context,
@@ -212,7 +220,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/login',
-                      (route) => false,
+                  (route) => false,
                 );
               }
             },
@@ -310,10 +318,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Text(value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
-          Text(title,
               style:
-              TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+                  const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+          Text(title,
+              style: TextStyle(
+                  color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -332,7 +341,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Icon(icon, color: color),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+            child: Text(title,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
           ),
           Text(value, style: const TextStyle(fontWeight: FontWeight.bold))
         ],
@@ -340,7 +350,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _chartCard({required String title, required Widget child, double height = 180}) {
+  Widget _chartCard(
+      {required String title, required Widget child, double height = 180}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -352,7 +363,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+          Text(title,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
           const SizedBox(height: 12),
           SizedBox(height: height, child: child),
         ],
@@ -360,7 +373,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildWeeklySalesChart(BuildContext context, AdminController controller) {
+  Widget _buildWeeklySalesChart(
+      BuildContext context, AdminController controller) {
     final now = DateTime.now();
     final days = List.generate(7, (i) => now.subtract(Duration(days: 6 - i)));
     final totals = days.map((day) {
@@ -384,9 +398,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -396,7 +413,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(labels[day.weekday - 1],
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                        style: TextStyle(
+                            fontSize: 11, color: Colors.grey.shade600)),
                   );
                 },
               ),
@@ -421,7 +439,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildCategoryBreakdownChart(BuildContext context, AdminController controller) {
+  Widget _buildCategoryBreakdownChart(
+      BuildContext context, AdminController controller) {
     final Map<String, int> counts = {};
     for (final p in controller.products) {
       counts[p.category] = (counts[p.category] ?? 0) + 1;
@@ -434,6 +453,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       );
     }
 
+    // One distinct color per category. ProductCategories.values currently
+    // has 8 entries — kept a couple of spares here so a color is never
+    // reused (reusing one made two unrelated categories look identical in
+    // the legend/chart, e.g. category #7 silently getting category #1's
+    // color back).
     final colors = [
       const Color(0xFF3B6FF6),
       const Color(0xFF11A36A),
@@ -441,8 +465,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       const Color(0xFF8B5CF6),
       const Color(0xFFEF4444),
       const Color(0xFF06B6D4),
+      const Color(0xFFEC4899),
+      const Color(0xFF84CC16),
+      const Color(0xFF6366F1),
+      const Color(0xFFF97316),
     ];
-    final entries = counts.entries.toList();
+    // Sort by count descending so the legend and pie slices are ordered
+    // from most to least stocked category, instead of arbitrary map order.
+    final entries = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
     final total = counts.values.fold<int>(0, (a, b) => a + b);
 
     return _chartCard(
@@ -466,7 +497,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       title: '${(entries[i].value / total * 100).round()}%',
                       radius: 46,
                       titleStyle: const TextStyle(
-                          fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                 ],
               ),
@@ -482,9 +515,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 child: Row(
                   children: [
                     Container(
-                      width: 10, height: 10,
+                      width: 10,
+                      height: 10,
                       decoration: BoxDecoration(
-                          color: colors[i % colors.length], shape: BoxShape.circle),
+                          color: colors[i % colors.length],
+                          shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -494,7 +529,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           style: const TextStyle(fontSize: 12)),
                     ),
                     Text('${entries[i].value}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                        style: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -505,7 +541,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildTopProductsChart(BuildContext context, AdminController controller) {
+  Widget _buildTopProductsChart(
+      BuildContext context, AdminController controller) {
     final Map<String, double> revenueByProduct = {};
     for (final order in controller.orders) {
       if (order.status == OrderStatus.cancelled) continue;
@@ -537,20 +574,27 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
-                  if (index < 0 || index >= topFive.length) return const SizedBox.shrink();
+                  if (index < 0 || index >= topFive.length)
+                    return const SizedBox.shrink();
                   final name = topFive[index].key;
-                  final short = name.length > 8 ? '${name.substring(0, 8)}…' : name;
+                  final short =
+                      name.length > 8 ? '${name.substring(0, 8)}…' : name;
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
-                    child: Text(short, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                    child: Text(short,
+                        style: TextStyle(
+                            fontSize: 10, color: Colors.grey.shade600)),
                   );
                 },
               ),
@@ -576,13 +620,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildManagementTile(
-      BuildContext context, {
-        required String title,
-        required String subtitle,
-        required IconData icon,
-        required Color color,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -591,7 +635,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           border: Border.all(color: Colors.grey.shade200)),
       child: ListTile(
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         leading: CircleAvatar(
           radius: 24,
           backgroundColor: color.withOpacity(.12),

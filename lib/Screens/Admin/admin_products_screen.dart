@@ -18,6 +18,8 @@ class AdminProductsScreen extends StatefulWidget {
 }
 
 class _AdminProductsScreenState extends State<AdminProductsScreen> {
+  String _selectedCategory = 'All';
+
   @override
   void initState() {
     super.initState();
@@ -58,7 +60,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
             return const ShimmerList();
           }
 
-          if (adminController.error != null && adminController.products.isEmpty) {
+          if (adminController.error != null &&
+              adminController.products.isEmpty) {
             return _buildErrorState(adminController.error!, () {
               adminController.clearError();
               adminController.loadProducts();
@@ -89,20 +92,81 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: adminController.products.length,
-            itemBuilder: (context, index) {
-              final product = adminController.products[index];
-              return _buildProductCard(context, product, adminController);
-            },
+          final filteredProducts = _selectedCategory == 'All'
+              ? adminController.products
+              : adminController.products
+                  .where((p) => p.category == _selectedCategory)
+                  .toList();
+
+          return Column(
+            children: [
+              _buildCategoryFilter(),
+              Expanded(
+                child: filteredProducts.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.filter_alt_off,
+                                size: 56, color: Colors.grey.shade400),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No products in "$_selectedCategory"',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = filteredProducts[index];
+                          return _buildProductCard(
+                              context, product, adminController);
+                        },
+                      ),
+              ),
+            ],
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue.shade700,
         child: const Icon(Icons.add),
-        onPressed: () => _openDialogNextFrame(() => _showAddProductDialog(context)),
+        onPressed: () =>
+            _openDialogNextFrame(() => _showAddProductDialog(context)),
+      ),
+    );
+  }
+
+  Widget _buildCategoryFilter() {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        scrollDirection: Axis.horizontal,
+        itemCount: ProductCategories.withAll.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final category = ProductCategories.withAll[index];
+          final isSelected = category == _selectedCategory;
+          return ChoiceChip(
+            label: Text(category),
+            selected: isSelected,
+            onSelected: (_) => setState(() => _selectedCategory = category),
+            selectedColor: Colors.blue.shade700,
+            labelStyle: TextStyle(
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+            backgroundColor: Colors.grey.shade100,
+          );
+        },
       ),
     );
   }
@@ -193,7 +257,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                           ),
                           if (product.isBestSeller)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.orange.shade50,
                                 borderRadius: BorderRadius.circular(4),
@@ -206,7 +271,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                             ),
                           if (product.isFeatured)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.purple.shade50,
                                 borderRadius: BorderRadius.circular(4),
@@ -271,22 +337,25 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                   icon: Icons.edit,
                   label: 'Edit',
                   color: Colors.blue,
-                  onTap: () => _openDialogNextFrame(
-                      () => _showEditProductDialog(context, product, adminController)),
+                  onTap: () => _openDialogNextFrame(() =>
+                      _showEditProductDialog(
+                          context, product, adminController)),
                 ),
                 _buildActionButton(
                   icon: Icons.inventory,
                   label: 'Stock',
                   color: Colors.orange,
-                  onTap: () => _openDialogNextFrame(
-                      () => _showUpdateStockDialog(context, product, adminController)),
+                  onTap: () => _openDialogNextFrame(() =>
+                      _showUpdateStockDialog(
+                          context, product, adminController)),
                 ),
                 _buildActionButton(
                   icon: Icons.delete,
                   label: 'Delete',
                   color: Colors.red,
-                  onTap: () => _openDialogNextFrame(
-                      () => _showDeleteConfirmation(context, product, adminController)),
+                  onTap: () => _openDialogNextFrame(() =>
+                      _showDeleteConfirmation(
+                          context, product, adminController)),
                 ),
               ],
             ),
@@ -372,12 +441,14 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                   onAdd: () async {
                     final bytes = await _pickImageBytes();
                     if (bytes != null) {
-                      setDialogState(() => pickedGalleryBytes = [...pickedGalleryBytes, bytes]);
+                      setDialogState(() =>
+                          pickedGalleryBytes = [...pickedGalleryBytes, bytes]);
                     }
                   },
                   onRemoveNew: (index) {
                     setDialogState(() {
-                      pickedGalleryBytes = List.of(pickedGalleryBytes)..removeAt(index);
+                      pickedGalleryBytes = List.of(pickedGalleryBytes)
+                        ..removeAt(index);
                     });
                   },
                   onRemoveExisting: (_) {},
@@ -434,7 +505,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                           stockController.text.trim().isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                              content: Text('Please fill in all required fields')),
+                              content:
+                                  Text('Please fill in all required fields')),
                         );
                         return;
                       }
@@ -453,7 +525,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                         );
                         final galleryUrls = <String>[];
                         for (final bytes in pickedGalleryBytes) {
-                          galleryUrls.add(await CloudinaryService.uploadImage(bytes));
+                          galleryUrls
+                              .add(await CloudinaryService.uploadImage(bytes));
                         }
 
                         final product = AdminProductModel(
@@ -475,7 +548,9 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                           isBestSeller: isBestSeller,
                           isFeatured: isFeatured,
                         );
-                        await context.read<AdminController>().addProduct(product);
+                        await context
+                            .read<AdminController>()
+                            .addProduct(product);
                         if (!dialogContext.mounted) return;
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -550,17 +625,20 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                   onAdd: () async {
                     final bytes = await _pickImageBytes();
                     if (bytes != null) {
-                      setDialogState(() => pickedGalleryBytes = [...pickedGalleryBytes, bytes]);
+                      setDialogState(() =>
+                          pickedGalleryBytes = [...pickedGalleryBytes, bytes]);
                     }
                   },
                   onRemoveNew: (index) {
                     setDialogState(() {
-                      pickedGalleryBytes = List.of(pickedGalleryBytes)..removeAt(index);
+                      pickedGalleryBytes = List.of(pickedGalleryBytes)
+                        ..removeAt(index);
                     });
                   },
                   onRemoveExisting: (index) {
                     setDialogState(() {
-                      existingGalleryUrls = List.of(existingGalleryUrls)..removeAt(index);
+                      existingGalleryUrls = List.of(existingGalleryUrls)
+                        ..removeAt(index);
                     });
                   },
                 ),
@@ -618,9 +696,13 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                         }
                         final newGalleryUrls = <String>[];
                         for (final bytes in pickedGalleryBytes) {
-                          newGalleryUrls.add(await CloudinaryService.uploadImage(bytes));
+                          newGalleryUrls
+                              .add(await CloudinaryService.uploadImage(bytes));
                         }
-                        final combinedGallery = [...existingGalleryUrls, ...newGalleryUrls];
+                        final combinedGallery = [
+                          ...existingGalleryUrls,
+                          ...newGalleryUrls
+                        ];
 
                         final updatedProduct = AdminProductModel(
                           productId: product.productId,
@@ -652,7 +734,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                       } catch (e) {
                         setDialogState(() => isSaving = false);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to update product: $e')),
+                          SnackBar(
+                              content: Text('Failed to update product: $e')),
                         );
                       }
                     },
@@ -673,7 +756,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
 
   void _showUpdateStockDialog(BuildContext context, AdminProductModel product,
       AdminController adminController) {
-    final stockController = TextEditingController(text: product.stock.toString());
+    final stockController =
+        TextEditingController(text: product.stock.toString());
 
     showDialog(
       context: context,
@@ -752,9 +836,8 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     required VoidCallback onPick,
   }) {
     final hasNewImage = imageBytes != null;
-    final hasExistingImage = !hasNewImage &&
-        existingUrl != null &&
-        existingUrl.isNotEmpty;
+    final hasExistingImage =
+        !hasNewImage && existingUrl != null && existingUrl.isNotEmpty;
 
     return Column(
       children: [
@@ -886,8 +969,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
       decoration: InputDecoration(
         labelText: 'Category',
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       items: ProductCategories.values
           .map(
@@ -918,6 +1000,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
       keyboardType: keyboardType,
     );
   }
+
   Widget _buildErrorState(String message, VoidCallback onRetry) {
     return Center(
       child: Padding(

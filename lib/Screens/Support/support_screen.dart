@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Controllers/auth_controller.dart';
+import '../../Controllers/chat_controller.dart';
 import '../../Controllers/support_controller.dart';
 import '../../Utils/app_theme.dart';
+import '../../Widgets/chat_view.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
@@ -32,13 +34,14 @@ class _SupportScreenState extends State<SupportScreen> {
     _emailController.dispose();
     _subjectController.dispose();
     _messageController.dispose();
+    context.read<ChatController>().closeThread();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Help & Support'),
@@ -46,6 +49,7 @@ class _SupportScreenState extends State<SupportScreen> {
             tabs: [
               Tab(text: 'FAQ'),
               Tab(text: 'Contact Us'),
+              Tab(text: 'Chat'),
             ],
           ),
         ),
@@ -58,9 +62,74 @@ class _SupportScreenState extends State<SupportScreen> {
               subjectController: _subjectController,
               messageController: _messageController,
             ),
+            const _LiveChatTab(),
           ],
         ),
       ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────
+// Live Chat Tab — real-time conversation with admin
+// ──────────────────────────────────────────────
+class _LiveChatTab extends StatefulWidget {
+  const _LiveChatTab();
+
+  @override
+  State<_LiveChatTab> createState() => _LiveChatTabState();
+}
+
+class _LiveChatTabState extends State<_LiveChatTab> {
+  final _textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => context.read<ChatController>().openMyChat());
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final text = _textController.text;
+    if (text.trim().isEmpty) return;
+    final auth = context.read<AuthController>();
+    final uid = auth.user?.uid;
+    if (uid == null) return;
+
+    final chat = context.read<ChatController>();
+    _textController.clear();
+    await chat.sendMessage(
+      userId: uid,
+      isAdmin: false,
+      text: text,
+      userName: auth.userName.isNotEmpty ? auth.userName : 'User',
+      userEmail: auth.user?.email ?? '',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ChatController>(
+      builder: (context, chat, _) {
+        return ChatView(
+          messages: chat.messages,
+          isLoading: chat.messagesLoading,
+          isSending: chat.isSending,
+          error: chat.error,
+          viewerIsAdmin: false,
+          textController: _textController,
+          onSend: _send,
+          emptyTitle: 'Chat with our support team',
+          emptyMessage:
+              'Send a message and we\'ll reply here as soon as we can.',
+        );
+      },
     );
   }
 }
@@ -80,52 +149,52 @@ class _FAQTabState extends State<_FAQTab> {
     {
       'question': 'How do I create an account?',
       'answer':
-      'To create an account, tap the "Sign Up" button on the login screen. Enter your name, email, and password. You\'ll receive a confirmation email to verify your account.',
+          'To create an account, tap the "Sign Up" button on the login screen. Enter your name, email, and password. You\'ll receive a confirmation email to verify your account.',
     },
     {
       'question': 'How do I place an order?',
       'answer':
-      'Browse products, add items to your cart, proceed to checkout, enter your delivery address, select payment method, and confirm your order. You\'ll receive an order confirmation email.',
+          'Browse products, add items to your cart, proceed to checkout, enter your delivery address, select payment method, and confirm your order. You\'ll receive an order confirmation email.',
     },
     {
       'question': 'What payment methods do you accept?',
       'answer':
-      'We accept all major credit cards, debit cards, and digital wallets. Our payment system is secure and encrypted for your protection.',
+          'We accept all major credit cards, debit cards, and digital wallets. Our payment system is secure and encrypted for your protection.',
     },
     {
       'question': 'How can I track my order?',
       'answer':
-      'Go to the "Orders" section in your profile to view all your orders. Tap on any order to see real-time tracking information including: Pending, Confirmed, Packed, Shipped, Out for Delivery, and Delivered.',
+          'Go to the "Orders" section in your profile to view all your orders. Tap on any order to see real-time tracking information including: Pending, Confirmed, Packed, Shipped, Out for Delivery, and Delivered.',
     },
     {
       'question': 'What is your return/refund policy?',
       'answer':
-      'You can return items within 30 days of delivery if they are unused and in original packaging. Please contact our support team to initiate a return.',
+          'You can return items within 30 days of delivery if they are unused and in original packaging. Please contact our support team to initiate a return.',
     },
     {
       'question': 'How do I write a review?',
       'answer':
-      'Go to a product you\'ve purchased, open the product details, tap "Reviews", then switch to "Write Review" tab. Rate the product and share your experience.',
+          'Go to a product you\'ve purchased, open the product details, tap "Reviews", then switch to "Write Review" tab. Rate the product and share your experience.',
     },
     {
       'question': 'How long does delivery take?',
       'answer':
-      'Standard delivery takes 3-5 business days. Express delivery (2-3 days) is available in selected areas. Delivery times are calculated from order confirmation.',
+          'Standard delivery takes 3-5 business days. Express delivery (2-3 days) is available in selected areas. Delivery times are calculated from order confirmation.',
     },
     {
       'question': 'Is my personal information secure?',
       'answer':
-      'Yes, we use industry-standard encryption and security protocols. Your data is protected by Firebase security and we never share your information with third parties.',
+          'Yes, we use industry-standard encryption and security protocols. Your data is protected by Firebase security and we never share your information with third parties.',
     },
     {
       'question': 'Can I cancel my order?',
       'answer':
-      'You can cancel your order only if it hasn\'t been shipped yet. Go to your Orders section and tap "Cancel" if the option is available.',
+          'You can cancel your order only if it hasn\'t been shipped yet. Go to your Orders section and tap "Cancel" if the option is available.',
     },
     {
       'question': 'How do I change my password?',
       'answer':
-      'Go to Profile → Change Password. Enter your current password and new password. Your password will be updated immediately.',
+          'Go to Profile → Change Password. Enter your current password and new password. Your password will be updated immediately.',
     },
   ];
 
@@ -219,7 +288,8 @@ class _ContactUsTabState extends State<_ContactUsTab> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(supportCtrl.error ?? 'Failed to send message. Please try again.'),
+          content: Text(
+              supportCtrl.error ?? 'Failed to send message. Please try again.'),
         ),
       );
     }
@@ -392,12 +462,13 @@ class _ContactUsTabState extends State<_ContactUsTab> {
                       onPressed: _isSubmitting ? null : _submitForm,
                       icon: _isSubmitting
                           ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : const Icon(Icons.send),
-                      label: Text(_isSubmitting ? 'Sending...' : 'Send Message'),
+                      label:
+                          Text(_isSubmitting ? 'Sending...' : 'Send Message'),
                     ),
                   ),
                 ],
@@ -434,7 +505,8 @@ class _ContactInfoCard extends StatelessWidget {
         leading: Icon(icon, color: AppTheme.primaryColor),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(subtitle),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+        trailing: Icon(Icons.arrow_forward_ios,
+            size: 16, color: Colors.grey.shade400),
         onTap: onTap,
       ),
     );

@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../Controllers/payment_controller.dart';
 import '../../Controllers/auth_controller.dart';
+import '../../Controllers/chat_controller.dart';
 import '../../Controllers/notification_controller.dart';
 import '../../Controllers/wishlist_controller.dart';
 import '../../Utils/app_theme.dart';
@@ -286,6 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (context.mounted) {
         context.read<WishlistController>().reset();
         context.read<NotificationController>().reset();
+        context.read<ChatController>().reset();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
