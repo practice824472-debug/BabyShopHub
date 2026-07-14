@@ -7,7 +7,8 @@ import '../Utils/product_categories.dart';
 
 class ProductController with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _productsSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      _productsSubscription;
 
   // Sourced from ProductCategories so the customer-facing filter list can
   // never drift from the categories the admin dropdown is allowed to save.
@@ -24,6 +25,12 @@ class ProductController with ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  /// True while the user is actively searching or has picked a specific
+  /// category — i.e. viewing filtered results rather than the default
+  /// home page merchandising (Best Sellers / Featured Products).
+  bool get isFiltering =>
+      _searchQuery.trim().isNotEmpty || _selectedCategory != 'All';
 
   List<ProductModel> get filteredProducts {
     return _products.where((product) {
@@ -45,7 +52,7 @@ class ProductController with ChangeNotifier {
         .where('isActive', isEqualTo: true)
         .snapshots(includeMetadataChanges: true)
         .listen(
-          (snapshot) {
+      (snapshot) {
         _products = snapshot.docs
             .map((doc) => ProductModel.fromJson(doc.data(), doc.id))
             .toList()
@@ -65,7 +72,6 @@ class ProductController with ChangeNotifier {
       _isLoading = true;
       _error = null;
       notifyListeners();
-
     }
   }
 
@@ -92,6 +98,7 @@ class ProductController with ChangeNotifier {
     _searchQuery = '';
     notifyListeners();
   }
+
   @override
   void dispose() {
     _productsSubscription?.cancel();

@@ -8,6 +8,7 @@ import '../../Controllers/wishlist_controller.dart';
 import '../../Utils/app_theme.dart';
 import '../Authentication/Views/splash_screen.dart';
 import '../Notifications/notifications_screen.dart';
+import '../Support/support_screen.dart';
 import '../Wishlist/wishlist_screen.dart';
 import 'change_password_screen.dart';
 import 'edit_profile_screen.dart';
@@ -69,7 +70,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(title: const Text('My Profile')),
       body: Consumer<AuthController>(
         builder: (context, auth, _) {
-          final savedCardsCount = context.watch<PaymentController>().savedCards.length;
+          final savedCardsCount =
+              context.watch<PaymentController>().savedCards.length;
           final email = auth.user?.email ?? '';
           final name = auth.userName.isNotEmpty ? auth.userName : 'User';
           final initials = _initials(name);
@@ -209,12 +211,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _MenuItem(
                 icon: Icons.notifications_outlined,
                 label: 'Notifications',
-                subtitle: context.watch<NotificationController>().unreadCount > 0
+                subtitle: context.watch<NotificationController>().unreadCount >
+                        0
                     ? '${context.watch<NotificationController>().unreadCount} unread'
                     : null,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                  MaterialPageRoute(
+                      builder: (_) => const NotificationsScreen()),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // ── Support section ──
+              _SectionLabel('Support'),
+              _MenuItem(
+                icon: Icons.help_outline,
+                label: 'Help & Support',
+                subtitle: 'Contact us or browse FAQs',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SupportScreen()),
                 ),
               ),
 
@@ -236,14 +254,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts =
+        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
     if (parts.isEmpty) return 'U';
     if (parts.length == 1) return parts[0][0].toUpperCase();
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
-  Future<void> _confirmLogout(
-      BuildContext context, AuthController auth) async {
+  Future<void> _confirmLogout(BuildContext context, AuthController auth) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

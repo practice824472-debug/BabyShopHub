@@ -116,8 +116,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         _buildSearchField(productController),
                         const SizedBox(height: 16),
                         _buildCategories(productController),
+                        // Best Sellers / Featured Products are home-page
+                        // merchandising, not search/category results — hide
+                        // them while the user is searching or has picked a
+                        // specific category so only the matching results show.
                         if (!productController.isLoading &&
-                            productController.error == null) ...[
+                            productController.error == null &&
+                            !productController.isFiltering) ...[
                           _buildMerchandisingSection(
                             title: 'Best Sellers',
                             icon: Icons.local_fire_department,
@@ -152,39 +157,39 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ),
                   )
                 else if (productController.filteredProducts.isEmpty)
-                    SliverFillRemaining(
-                      child: _buildMessageState(
-                        icon: Icons.search_off,
-                        title: 'No products found',
-                        message: 'Try another category or search keyword.',
-                        actionLabel: 'Clear Filters',
-                        onAction: () {
-                          _searchController.clear();
-                          productController.clearFilters();
+                  SliverFillRemaining(
+                    child: _buildMessageState(
+                      icon: Icons.search_off,
+                      title: 'No products found',
+                      message: 'Try another category or search keyword.',
+                      actionLabel: 'Clear Filters',
+                      onAction: () {
+                        _searchController.clear();
+                        productController.clearFilters();
+                      },
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    sliver: SliverGrid(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final product =
+                              productController.filteredProducts[index];
+                          return ProductCard(product: product);
                         },
+                        childCount: productController.filteredProducts.length,
                       ),
-                    )
-                  else
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      sliver: SliverGrid(
-                        delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                            final product =
-                            productController.filteredProducts[index];
-                            return ProductCard(product: product);
-                          },
-                          childCount: productController.filteredProducts.length,
-                        ),
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.68,
-                        ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.68,
                       ),
                     ),
+                  ),
               ],
             ),
           );
@@ -232,12 +237,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         suffixIcon: productController.searchQuery.isEmpty
             ? null
             : IconButton(
-          onPressed: () {
-            _searchController.clear();
-            productController.updateSearchQuery('');
-          },
-          icon: const Icon(Icons.close),
-        ),
+                onPressed: () {
+                  _searchController.clear();
+                  productController.updateSearchQuery('');
+                },
+                icon: const Icon(Icons.close),
+              ),
       ),
     );
   }
@@ -303,12 +308,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   Widget _buildSectionHeader(ProductController productController) {
     final count = productController.filteredProducts.length;
+    final String title;
+    if (productController.searchQuery.trim().isNotEmpty) {
+      title = 'Search Results';
+    } else if (productController.selectedCategory == 'All') {
+      title = 'Featured Products';
+    } else {
+      title = productController.selectedCategory;
+    }
     return Row(
       children: [
         Text(
-          productController.selectedCategory == 'All'
-              ? 'Featured Products'
-              : productController.selectedCategory,
+          title,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const Spacer(),
@@ -347,4 +358,3 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     );
   }
 }
-

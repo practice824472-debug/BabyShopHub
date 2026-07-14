@@ -1,0 +1,258 @@
+You are an experienced Android developer. Improve my existing BabyShopHub Android application without breaking any existing functionality. Follow Material Design 3 principles, keep the UI responsive, and write clean, maintainable code.
+
+1. Contact Admin Feature
+
+Currently, there is no way for users to contact the administrator.
+
+Create a new Contact Us screen that is accessible from the Profile page or Navigation Drawer.
+
+The screen should contain:
+
+Full Name
+Email Address
+Subject
+Message (multiline)
+Send button
+
+When the user taps Send:
+
+Validate all fields.
+Save the message to Firebase Firestore under:
+ContactMessages
+    messageId
+        userId
+        name
+        email
+        subject
+        message
+        timestamp
+
+Show a success Snackbar or Toast after submission.
+
+If submission fails, show an appropriate error message.
+
+The design should match the rest of the application.
+
+2. FAQ Screen
+
+Create a new Frequently Asked Questions page.
+
+Use expandable cards or Material Expansion Panels.
+
+Include questions such as:
+
+How do I place an order?
+How do I track my order?
+How do I cancel an order?
+How do I reset my password?
+What payment methods are accepted?
+How can I contact customer support?
+
+The page should have a modern and clean UI.
+
+Add navigation to this page from the Profile or Settings screen.
+
+3. Fix Product Search Behavior
+
+Currently, when a user searches for a product or opens a category, the Home page still displays Featured Products and Best Sellers.
+
+This is incorrect.
+
+Implement the following behavior:
+
+When the Search Bar contains text:
+
+Hide Featured Products
+Hide Best Sellers
+Hide Recommended Products (if present)
+
+Only display the Search Results.
+
+When the Search Bar becomes empty again:
+
+Restore Featured Products
+Restore Best Sellers
+Restore the normal Home page.
+
+This update should happen dynamically while typing.
+
+4. Product Search Filters
+
+Improve the search experience by adding a Filter button beside the Search Bar.
+
+Allow filtering by:
+
+Category
+
+Clothing
+Toys
+Feeding
+Diapers
+Accessories
+
+Price
+
+Low to High
+High to Low
+
+Availability
+
+In Stock
+Out of Stock
+
+Ratings
+
+4★ and above
+3★ and above
+
+Sort By
+
+Newest
+Most Popular
+Best Selling
+
+The filters should update the displayed products immediately without reloading the entire screen.
+
+5. Add Promotional Image Carousel
+
+Above the Search Bar, add an auto-scrolling image carousel.
+
+The carousel should support promotional banners such as:
+
+New Arrivals
+Summer Sale
+Baby Essentials
+Free Delivery
+50% Off Selected Items
+
+Requirements:
+
+Auto-scroll every 3 seconds
+Swipe support
+Infinite looping
+Indicator dots
+Smooth animation
+Responsive on all screen sizes
+
+The images should be loaded from Firebase Storage if available, otherwise use drawable resources.
+
+6. Improve Home Screen Layout
+
+The Home screen should follow this structure:
+
+Toolbar
+
+Image Carousel
+
+Search Bar + Filter Button
+
+Categories
+
+Featured Products
+
+Best Sellers
+
+When searching:
+
+Toolbar
+
+Image Carousel
+
+Search Bar + Filter Button
+
+Search Results
+
+Featured Products and Best Sellers must disappear completely while searching.
+
+7. Improve Search Performance
+
+Optimize searching using:
+
+RecyclerView DiffUtil
+TextWatcher
+Debounce (approximately 300 milliseconds)
+Efficient Firebase Firestore queries
+
+The search should feel fast and smooth.
+
+8. Empty Search State
+
+If no matching products are found, replace the RecyclerView with a friendly empty state.
+
+Display:
+
+An illustration or icon
+"No products found"
+"Try searching with another keyword."
+
+Do not leave an empty list.
+
+9. Fix Signup Screen UI
+
+There is a UI issue on the Sign Up page.
+
+Below the Continue with Google button, there is a large blank white space before the bottom of the screen.
+
+Fix this layout issue by:
+
+Removing unnecessary bottom margins or padding.
+Removing fixed heights.
+Using ConstraintLayout properly.
+Using ScrollView or NestedScrollView only where needed.
+Ensuring the content wraps correctly on different screen sizes.
+
+The page should look balanced without excessive empty space.
+
+10. Improve Overall UI
+
+Improve the visual design throughout the application.
+
+Use:
+
+Material Design 3 components
+Rounded Cards
+Consistent spacing
+Better typography
+Proper elevation
+Smooth animations
+Modern buttons
+Responsive layouts
+
+Ensure all screens have consistent margins, padding, and alignment.
+
+11. Firebase Integration
+
+Keep all existing Firebase Authentication and Firestore functionality working.
+
+Use Firestore for:
+
+Contact Messages
+Product Search
+Product Filtering
+
+Use Firebase Storage for carousel images if available.
+
+12. Code Quality
+
+While implementing these features:
+
+Do not remove existing functionality.
+Do not introduce bugs.
+Refactor code where necessary.
+Follow MVVM architecture if the project already uses it.
+Keep the code modular, readable, and maintainable.
+Ensure there are no crashes or memory leaks.
+Expected Result
+
+After implementation, the application should include:
+
+Contact Us page
+FAQ page
+Auto-scrolling promotional carousel
+Advanced search filters
+Correct search behavior that hides Featured Products and Best Sellers while searching
+Fixed Sign Up page spacing issue
+Better empty search state
+Improved Material Design UI
+Smooth animations and optimized performance
+Fully functional Firebase integration without breaking any existing features.
