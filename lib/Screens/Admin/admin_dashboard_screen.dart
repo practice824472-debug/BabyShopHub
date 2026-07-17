@@ -185,6 +185,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         onTap: () =>
                             Navigator.pushNamed(context, '/admin-coupons'),
                       ),
+                      _buildManagementTile(
+                        context,
+                        title: 'Live Chat',
+                        subtitle: 'Reply to user support conversations',
+                        icon: Icons.chat_outlined,
+                        color: const Color(0xFF0EA5E9),
+                        onTap: () =>
+                            Navigator.pushNamed(context, '/admin-chat'),
+                      ),
                     ],
                   ),
                 ),

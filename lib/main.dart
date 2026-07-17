@@ -14,6 +14,7 @@ import 'Controllers/chat_controller.dart';
 import 'Controllers/review_controller.dart';
 import 'Controllers/support_controller.dart';
 import 'Controllers/wishlist_controller.dart';
+import 'Screens/Admin/admin_chat_inbox_screen.dart';
 import 'Screens/Admin/admin_coupons_screen.dart';
 import 'Screens/Admin/admin_dashboard_screen.dart';
 import 'Screens/Admin/admin_messages_screen.dart';
@@ -80,6 +81,7 @@ class MyApp extends StatelessWidget {
           '/admin-orders': (_) => const AdminOrdersScreen(),
           '/admin-users': (_) => const AdminUsersScreen(),
           '/admin-coupons': (_) => const AdminCouponsScreen(),
+          '/admin-chat': (_) => const AdminChatInboxScreen(),
           '/admin-messages': (_) => const AdminMessagesScreen(),
           '/checkout': (_) => const AddressScreen(),
           '/orders': (_) => const OrdersScreen(),
