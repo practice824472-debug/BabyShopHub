@@ -110,7 +110,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 'Pending',
                                 '${stats?.pendingOrders ?? 0}',
                                 Icons.pending_actions,
-                                Colors.deepOrange),
+                                Colors.deepOrange,
+                                onTap: () => Navigator.pushNamed(
+                                    context, '/admin-orders')),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -118,7 +120,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 'Active products',
                                 '${stats?.activeProducts ?? 0}',
                                 Icons.verified,
-                                Colors.teal),
+                                Colors.teal,
+                                onTap: () => Navigator.pushNamed(
+                                    context, '/admin-products')),
                           ),
                         ],
                       ),
@@ -180,15 +184,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         color: const Color(0xFF8B5CF6),
                         onTap: () =>
                             Navigator.pushNamed(context, '/admin-coupons'),
-                      ),
-                      _buildManagementTile(
-                        context,
-                        title: 'User Messages',
-                        subtitle: 'Review and respond to contact inquiries',
-                        icon: Icons.mark_email_unread_outlined,
-                        color: const Color(0xFFEF4444),
-                        onTap: () =>
-                            Navigator.pushNamed(context, '/admin-messages'),
                       ),
                     ],
                   ),
@@ -329,23 +324,33 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildMiniMetric(
-      String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.grey.shade200)),
-      child: Row(
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(title,
-                style: const TextStyle(fontWeight: FontWeight.w700)),
-          ),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold))
-        ],
+      String title, String value, IconData icon, Color color,
+      {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.grey.shade200)),
+        child: Row(
+          children: [
+            Icon(icon, color: color),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(title,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+            ),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+            if (onTap != null) ...[
+              const SizedBox(width: 6),
+              Icon(Icons.arrow_forward_ios,
+                  size: 12, color: Colors.grey.shade400),
+            ],
+          ],
+        ),
       ),
     );
   }

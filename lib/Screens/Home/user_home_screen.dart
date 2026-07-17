@@ -177,22 +177,33 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 else
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    sliver: SliverGrid(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final product =
-                              productController.filteredProducts[index];
-                          return ProductCard(product: product);
-                        },
-                        childCount: productController.filteredProducts.length,
-                      ),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.68,
-                      ),
+                    sliver: SliverLayoutBuilder(
+                      builder: (context, constraints) {
+                        final width = constraints.crossAxisExtent;
+                        final crossAxisCount = width >= 900
+                            ? 4
+                            : width >= 600
+                                ? 3
+                                : 2;
+                        return SliverGrid(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final product =
+                                  productController.filteredProducts[index];
+                              return ProductCard(product: product);
+                            },
+                            childCount:
+                                productController.filteredProducts.length,
+                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.68,
+                          ),
+                        );
+                      },
                     ),
                   ),
               ],

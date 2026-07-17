@@ -301,14 +301,50 @@ class AdminController with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      final snapshot = await _firestore
-          .collection('users')
-          .where('role', isNotEqualTo: 'admin')
-          .get();
+      // Load users and all orders in parallel.
+      final results = await Future.wait([
+        _firestore
+            .collection('users')
+            .where('role', isNotEqualTo: 'admin')
+            .get(),
+        _firestore.collection('orders').get(),
+      ]);
 
-      _users = snapshot.docs
-          .map((doc) => AdminUserModel.fromJson(doc.data(), doc.id))
-          .toList();
+      final usersSnapshot = results[0];
+      final ordersSnapshot = results[1];
+
+      // Aggregate per-user totals from actual orders.
+      final Map<String, int> orderCounts = {};
+      final Map<String, double> orderTotals = {};
+      for (final doc in ordersSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final uid = data['userId'] as String? ?? '';
+        if (uid.isEmpty) continue;
+        // Exclude cancelled orders from total spent.
+        final status = data['status'] as String? ?? '';
+        orderCounts[uid] = (orderCounts[uid] ?? 0) + 1;
+        if (status != 'cancelled') {
+          final price = (data['totalPrice'] ?? 0.0);
+          orderTotals[uid] = (orderTotals[uid] ?? 0.0) +
+              (price is num ? price.toDouble() : 0.0);
+        }
+      }
+
+      _users = usersSnapshot.docs.map((doc) {
+        final base = AdminUserModel.fromJson(doc.data(), doc.id);
+        return AdminUserModel(
+          uid: base.uid,
+          name: base.name,
+          email: base.email,
+          phone: base.phone,
+          isDisabled: base.isDisabled,
+          isAdmin: base.isAdmin,
+          createdAt: base.createdAt,
+          lastLogin: base.lastLogin,
+          totalOrders: orderCounts[base.uid] ?? 0,
+          totalSpent: orderTotals[base.uid] ?? 0.0,
+        );
+      }).toList();
 
       _usersLoading = false;
       notifyListeners();

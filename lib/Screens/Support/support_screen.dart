@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Controllers/auth_controller.dart';
 import '../../Controllers/chat_controller.dart';
-import '../../Controllers/support_controller.dart';
 import '../../Utils/app_theme.dart';
 import '../../Widgets/chat_view.dart';
 
@@ -14,26 +13,8 @@ class SupportScreen extends StatefulWidget {
 }
 
 class _SupportScreenState extends State<SupportScreen> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _subjectController = TextEditingController();
-  final _messageController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    // Pre-fill from the signed-in user's profile, if available.
-    final auth = context.read<AuthController>();
-    _nameController.text = auth.userName;
-    _emailController.text = auth.user?.email ?? '';
-  }
-
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _subjectController.dispose();
-    _messageController.dispose();
     context.read<ChatController>().closeThread();
     super.dispose();
   }
@@ -56,12 +37,7 @@ class _SupportScreenState extends State<SupportScreen> {
         body: TabBarView(
           children: [
             _FAQTab(),
-            _ContactUsTab(
-              nameController: _nameController,
-              emailController: _emailController,
-              subjectController: _subjectController,
-              messageController: _messageController,
-            ),
+            const _ContactUsTab(),
             const _LiveChatTab(),
           ],
         ),
@@ -238,66 +214,8 @@ class _FAQTabState extends State<_FAQTab> {
 // ──────────────────────────────────────────────
 // Contact Us Tab
 // ──────────────────────────────────────────────
-class _ContactUsTab extends StatefulWidget {
-  final TextEditingController nameController;
-  final TextEditingController emailController;
-  final TextEditingController subjectController;
-  final TextEditingController messageController;
-
-  const _ContactUsTab({
-    required this.nameController,
-    required this.emailController,
-    required this.subjectController,
-    required this.messageController,
-  });
-
-  @override
-  State<_ContactUsTab> createState() => _ContactUsTabState();
-}
-
-class _ContactUsTabState extends State<_ContactUsTab> {
-  bool _isSubmitting = false;
-  final _formKey = GlobalKey<FormState>();
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSubmitting = true);
-
-    final auth = context.read<AuthController>();
-    final supportCtrl = context.read<SupportController>();
-    final success = await supportCtrl.submitMessage(
-      userId: auth.user?.uid,
-      name: widget.nameController.text.trim(),
-      email: widget.emailController.text.trim(),
-      subject: widget.subjectController.text.trim(),
-      message: widget.messageController.text.trim(),
-    );
-
-    if (!mounted) return;
-
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Thank you! We\'ll get back to you soon.'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      widget.subjectController.clear();
-      widget.messageController.clear();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              supportCtrl.error ?? 'Failed to send message. Please try again.'),
-        ),
-      );
-    }
-
-    if (mounted) {
-      setState(() => _isSubmitting = false);
-    }
-  }
+class _ContactUsTab extends StatelessWidget {
+  const _ContactUsTab();
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +235,7 @@ class _ContactUsTabState extends State<_ContactUsTab> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Have a question? We\'d love to hear from you. Send us a message and we\'ll respond as soon as possible.',
+                  'Have a question? We\'d love to hear from you.',
                   style: TextStyle(color: Colors.grey.shade700, height: 1.5),
                 ),
               ],
@@ -350,129 +268,6 @@ class _ContactUsTabState extends State<_ContactUsTab> {
                   onTap: () {},
                 ),
               ],
-            ),
-          ),
-
-          const Divider(),
-
-          // Contact form
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Send us a Message',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Name field
-                  TextFormField(
-                    controller: widget.nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Full Name',
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Email field
-                  TextFormField(
-                    controller: widget.emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: const Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Subject field
-                  TextFormField(
-                    controller: widget.subjectController,
-                    decoration: InputDecoration(
-                      labelText: 'Subject',
-                      prefixIcon: const Icon(Icons.subject_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter a subject';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Message field
-                  TextFormField(
-                    controller: widget.messageController,
-                    maxLines: 5,
-                    minLines: 4,
-                    decoration: InputDecoration(
-                      labelText: 'Message',
-                      prefixIcon: const Icon(Icons.message_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignLabelWithHint: true,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your message';
-                      }
-                      if (value.trim().length < 10) {
-                        return 'Message must be at least 10 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Submit button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _isSubmitting ? null : _submitForm,
-                      icon: _isSubmitting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.send),
-                      label:
-                          Text(_isSubmitting ? 'Sending...' : 'Send Message'),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
           const SizedBox(height: 20),
